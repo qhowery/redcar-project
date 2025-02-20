@@ -1,0 +1,37 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build",
+        "buildCommand": "npm run build",
+        "installCommand": "npm install"
+      }
+    },
+    {
+      "src": "backend/main.ts",
+      "use": "@vercel/node",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+    
+  ],
+  "routes": [
+  {
+    "src": "/auth/(.*)",
+    "dest": "backend/main.ts"
+  },
+  {
+    "src": "/ask",
+    "dest": "backend/main.ts"
+  },
+  {
+    "src": "/(.*)",
+    "dest": "frontend/$1"
+  }
+]
+
+}

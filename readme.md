@@ -1,4 +1,3 @@
-Below is an example README in Markdown that documents everything we have so far:
 
 # Company Question Answering Project
 
@@ -24,35 +23,51 @@ This project is a full-stack application that allows users to ask questions abou
 - [License](#license)
 - [Contact](#contact)
 
+---
+
 ## Overview
 
 This application provides a seamless experience where:
-- Users can **register** and **login** to obtain a JWT.
+- Users can **register** and **login** using JWT-based authentication.
 - Authenticated users can submit questions to the `/ask` endpoint.
 - The backend processes the question via the OpenAI API and streams answer updates in real time.
 - The frontend displays the question, streaming updates, and the final answer.
 
+### Deployment:
+- **Backend:** Hosted on [Railway](https://railway.app/)  
+- **Database:** Managed using [Neon PostgreSQL](https://neon.tech/)  
+- **Frontend:** Deployed via [Vercel](https://vercel.com/)  
+
+---
+
 ## Features
 
-- **JWT Authentication:** Secure login and registration with token-based access.
+- **JWT Authentication:** Secure authentication system using Railway-hosted backend and Neon PostgreSQL.
 - **Protected Endpoints:** Only authenticated users can access the question endpoint.
 - **Real-Time Streaming:** Uses Socket.IO to stream interim updates and final responses.
-- **User-Friendly UI:** Built with React to provide login, registration, and interactive question submission.
+- **Vercel Deployment:** Frontend is hosted on Vercel with static build optimizations.
+- **Enhanced Session Management:** Session expiration handling with automatic logout.
 - **Automated Testing:** Unit and e2e tests for authentication and protected routes.
+
+---
 
 ## Technologies
 
-- **Backend:** NestJS, TypeScript, Axios, Socket.IO, JWT, Passport
+- **Backend:** NestJS, TypeScript, Axios, Socket.IO, JWT, Passport, PostgreSQL
 - **Frontend:** React, TypeScript, Socket.IO-client
+- **Deployment:** Railway (backend), Neon (PostgreSQL), Vercel (frontend)
 - **Testing:** Jest, Supertest
+
+---
 
 ## Setup Instructions
 
 ### Backend Setup
 
-1. **Navigate to the backend folder:**
+1. **Clone the repository:**
    ```bash
-   cd backend
+   git clone https://github.com/qhowery/redcar-project.git
+   cd redcar-project/backend
    ```
 2. **Install dependencies:**
    ```bash
@@ -61,10 +76,15 @@ This application provides a seamless experience where:
 3. **Configure environment variables:**
    Create a `.env` file in the `backend` folder with:
    ```
+   DATABASE_URL=your_neon_postgresql_database_url
    JWT_SECRET=your_jwt_secret
    OPENAI_API_KEY=your_openai_api_key
    ```
-4. **Start the backend server in development mode:**
+4. **Run database migrations:**
+   ```bash
+   npm run migration:run
+   ```
+5. **Start the backend server in development mode:**
    ```bash
    npm run start:dev
    ```
@@ -83,25 +103,26 @@ This application provides a seamless experience where:
    ```bash
    npm start
    ```
-   The app should open in your browser (typically at [http://localhost:3000](http://localhost:3000), or another port if there is a conflict).
+   The app should open in your browser (typically at [http://localhost:3000](http://localhost:3000)).
 
 ### Environment Variables
 
+- **DATABASE_URL:** Connection string for the PostgreSQL database (hosted on Neon).
 - **JWT_SECRET:** A secret key used to sign JWT tokens.
 - **OPENAI_API_KEY:** Your API key for accessing the OpenAI API.
 
-Make sure these are securely set, especially in production.
+---
 
 ## API Endpoints
 
 ### User Registration
 
-- **Endpoint:** `POST /auth/register` (or `/api/auth/register` if a global prefix is used)
+- **Endpoint:** `POST /auth/register`
 - **Description:** Registers a new user.
 - **Request Body:**
   ```json
   {
-    "username": "newuser",
+    "email": "newuser@example.com",
     "password": "newpassword"
   }
   ```
@@ -114,12 +135,12 @@ Make sure these are securely set, especially in production.
 
 ### User Login
 
-- **Endpoint:** `POST /auth/login` (or `/api/auth/login`)
+- **Endpoint:** `POST /auth/login`
 - **Description:** Logs in a user and returns a JWT token.
 - **Request Body:**
   ```json
   {
-    "username": "test",
+    "email": "test@example.com",
     "password": "password"
   }
   ```
@@ -132,7 +153,7 @@ Make sure these are securely set, especially in production.
 
 ### Ask Question (Protected)
 
-- **Endpoint:** `POST /ask` (or `/api/ask`)
+- **Endpoint:** `POST /ask`
 - **Description:** Submits a question to generate an answer. Requires a valid JWT in the `Authorization` header.
 - **Request Body:**
   ```json
@@ -142,12 +163,18 @@ Make sure these are securely set, especially in production.
   ```
 - **Response:** The generated answer (streamed in real time via Socket.IO).
 
+---
+
 ## Real-Time Streaming
 
 The backend uses Socket.IO to send real-time updates. When a question is submitted:
 - The backend initially emits a "Processing" message.
-- It then streams answer chunks (using true streaming or a simulated approach) as they are generated.
+- It then streams answer chunks as they are generated.
 - The frontend listens for `serverMessage` events and displays these updates.
+
+Additionally, the frontend fetches the latest server message every **5 seconds** to ensure smooth user experience.
+
+---
 
 ## Testing
 
@@ -169,23 +196,63 @@ From the backend folder, you can run:
 
 ### What to Test
 
-- **AuthService:** Validate that user credentials are checked properly and that tokens are generated.
-- **Authentication Flow:** E2E tests to simulate a login flow and then accessing protected endpoints.
-- **Error Scenarios:** Test invalid credentials, duplicate registration, expired tokens, etc.
+- **Authentication Flow:** Verify login, logout, and session management.
+- **Database Transactions:** Ensure PostgreSQL queries function correctly.
+- **Streaming Messages:** Validate real-time updates via Socket.IO.
+- **Error Handling:** Test invalid credentials, expired sessions, and API errors.
+
+---
 
 ## Future Enhancements
 
-- **Persistent Database Integration:** Replace the in-memory user store with a real database and hash passwords securely.
-- **Role-Based Access Control:** Implement roles and guards to manage different access levels.
-- **Improved Streaming:** Enhance real-time streaming by processing API response streams directly.
-- **UI/UX Improvements:** Refine the frontend with advanced styling and user feedback.
+- **Role-Based Access Control:** Implement admin and user roles with different permissions.
+- **Improved Real-Time Features:** Enhance the streaming mechanism for smoother updates.
+- **Analytics Dashboard:** Track question trends and usage statistics.
 - **CI/CD Pipeline:** Set up automated testing and deployment workflows.
+- **Improved UI/UX:** Optimize the frontend layout and design.
+
+---
 
 ## Deployment
 
-- **Environment Variables:** Ensure that production secrets (JWT secret, API keys, database credentials) are managed securely.
-- **Platforms:** Consider deploying the backend to Heroku, AWS, or similar and the frontend to Vercel, Netlify, etc.
-- **Update URLs:** Adjust API URLs in the frontend for production.
+### Backend Deployment (Railway)
+
+The backend is hosted on **Railway**. Deploy by running:
+```bash
+git push railway main
+```
+Ensure **DATABASE_URL** and **JWT_SECRET** are set in Railway environment variables.
+
+### Database Setup (Neon PostgreSQL)
+
+The database is hosted on **Neon**. You can manage migrations with:
+```bash
+npm run migration:run
+```
+Ensure the **DATABASE_URL** is configured properly.
+
+### Frontend Deployment (Vercel)
+
+The frontend is deployed on **Vercel** using the following build configuration:
+```json
+{
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "build"
+      }
+    }
+  ]
+}
+```
+Deploy with:
+```bash
+git push vercel main
+```
+
+---
 
 ## Contact
 

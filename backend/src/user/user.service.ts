@@ -33,4 +33,12 @@ export class UserService {
     });
     return this.userRepository.save(newUser);
   }
+
+  async addHistory(userId: number, historyItem: { question: string; answer: string }): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) throw new Error('User not found');
+    user.history = user.history || [];
+    user.history.push(historyItem);
+    return this.userRepository.save(user);
+  }
 }

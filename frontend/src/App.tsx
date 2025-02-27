@@ -34,10 +34,12 @@ const App: React.FC = () => {
   
           const userData = await response.json();
           setUser(userData);
+          setHistory(userData.history || []);
         } catch (err) {
           console.error('Session check failed:', err);
           localStorage.removeItem('access_token');
           setToken(null);
+          setHistory([]); // Clear history on session failure
         }
       }
     };
@@ -82,7 +84,6 @@ const App: React.FC = () => {
       const data = await response.json();
       localStorage.setItem('access_token', data.access_token);
       setToken(data.access_token);
-      setUser(data.user);
     } catch (err: any) {
       console.error('Login error:', err);
       alert(err.message || 'Login failed. Please check your credentials.');
@@ -117,6 +118,8 @@ const App: React.FC = () => {
     localStorage.removeItem('access_token');
     setUser(null);
     setToken(null);
+    setHistory([]); // Clear history on logout
+    setStreamMessages([]);
   };
 
   const handleQuestionSubmit = async (question: string) => {

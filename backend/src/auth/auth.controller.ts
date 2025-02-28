@@ -12,7 +12,7 @@ import {
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
-import { UserService } from '../user/user.service'; // Add this import
+import { UserService } from '../user/user.service'; 
 import { RegisterDto } from './register.dto';
 import { LoginDto } from './login.dto';
 import { JwtPayload } from '../../types/jwt-payload';
